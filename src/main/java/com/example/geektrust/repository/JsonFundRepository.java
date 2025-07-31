@@ -23,7 +23,7 @@ public class JsonFundRepository implements FundRepository {
         if (jsonFilePath == null || jsonFilePath.trim().isEmpty()) {
             throw new IllegalArgumentException("JSON file path cannot be null or empty");
         }
-        loadFunds(jsonFilePath);
+        loadFundsFromPath(jsonFilePath);
     }
 
     public JsonFundRepository(InputStream inputStream) {
@@ -33,16 +33,46 @@ public class JsonFundRepository implements FundRepository {
         loadFunds(inputStream);
     }
 
-    private void loadFunds(String jsonFilePath) {
+    private void loadFundsFromPath(String jsonFilePath) {
+        // Try multiple strategies to load the file
+        InputStream inputStream = null;
+        
         try {
+            // Strategy 1: Try as file in current directory
             File jsonFile = new File(jsonFilePath);
-            if (!jsonFile.exists()) {
-                LOGGER.log(Level.SEVERE, "JSON file not found: " + jsonFilePath);
+            if (jsonFile.exists()) {
+                LOGGER.log(Level.INFO, "Loading funds from file: " + jsonFile.getAbsolutePath());
+                processJson(objectMapper.readTree(jsonFile));
                 return;
             }
-            processJson(objectMapper.readTree(jsonFile));
+            
+            // Strategy 2: Try as absolute path (if it's absolute and exists)
+            if (jsonFile.isAbsolute() && jsonFile.exists()) {
+                LOGGER.log(Level.INFO, "Loading funds from absolute path: " + jsonFile.getAbsolutePath());
+                processJson(objectMapper.readTree(jsonFile));
+                return;
+            }
+            
+            // Strategy 3: Try as classpath resource (fallback for packaged JAR)
+            inputStream = getClass().getClassLoader().getResourceAsStream(jsonFilePath);
+            if (inputStream != null) {
+                LOGGER.log(Level.INFO, "Loading funds from classpath resource: " + jsonFilePath);
+                processJson(objectMapper.readTree(inputStream));
+                return;
+            }
+            
+            LOGGER.log(Level.SEVERE, "JSON file not found in any location: " + jsonFilePath);
+            
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error loading funds from JSON file: " + jsonFilePath, e);
+            LOGGER.log(Level.SEVERE, "Error loading funds from JSON: " + jsonFilePath, e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Error closing input stream", e);
+                }
+            }
         }
     }
 
@@ -87,7 +117,7 @@ public class JsonFundRepository implements FundRepository {
         }
         
         isLoaded = true;
-        LOGGER.log(Level.INFO, "Successfully loaded " + allFunds.size() + " funds");
+        // LOGGER.log(Level.INFO, "Successfully loaded " + allFunds.size() + " funds");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.geektrust.handler;
 
 import com.example.geektrust.command.ParsedCommand;
+import com.example.geektrust.constants.ErrorMessages;
 import com.example.geektrust.repository.FundRepository;
 import com.example.geektrust.repository.ModifiableFundRepository;
 
@@ -19,7 +20,7 @@ public class AddStockCommandHandler implements CommandHandler {
         String stockName = command.getArgument(1);
 
         if (!fundRepository.getFundByName(fundName).isPresent()) {
-            return CommandResult.error("FUND_NOT_FOUND");
+            return CommandResult.error(ErrorMessages.FUND_NOT_FOUND);
         }
 
         fundRepository.addStockToFund(fundName, stockName);

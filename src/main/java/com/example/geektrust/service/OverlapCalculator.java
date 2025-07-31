@@ -11,6 +11,9 @@ public class OverlapCalculator {
     
     private static final int DECIMAL_PLACES = 2;
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
+    private static final double OVERLAP_MULTIPLIER = 2.0;
+    private static final double PERCENTAGE_MULTIPLIER = 100.0;
+    private static final double ZERO_OVERLAP = 0.0;
     
     public double calculateOverlapPercentage(Fund fund1, Fund fund2) {
         if (fund1 == null || fund2 == null) {
@@ -21,10 +24,10 @@ public class OverlapCalculator {
         int totalStocks = fund1.getStockCount() + fund2.getStockCount();
         
         if (totalStocks == 0) {
-            return 0.0;
+            return ZERO_OVERLAP;
         }
         
-        double overlap = (2.0 * commonStocks.size()) / totalStocks * 100;
+        double overlap = (OVERLAP_MULTIPLIER * commonStocks.size()) / totalStocks * PERCENTAGE_MULTIPLIER;
         return roundToTwoDecimalPlaces(overlap);
     }
     

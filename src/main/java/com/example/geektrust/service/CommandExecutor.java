@@ -17,6 +17,10 @@ import java.util.logging.Logger;
 public class CommandExecutor {
     private static final Logger LOGGER = Logger.getLogger(CommandExecutor.class.getName());
     
+    private static final String NO_HANDLER_ERROR_PREFIX = "No handler found for command: ";
+    private static final String INVALID_COMMAND_ERROR_PREFIX = "Invalid command: ";
+    private static final String EXECUTION_ERROR_PREFIX = "Error executing command: ";
+    
     private final Map<CommandType, CommandHandler> handlers = new HashMap<>();
     private final CommandParser commandParser = new CommandParser();
 
@@ -33,7 +37,7 @@ public class CommandExecutor {
                 CommandHandler handler = handlers.get(command.getCommandType());
                 
                 if (handler == null) {
-                    results.add(CommandResult.error("No handler found for command: " + command.getCommandType()));
+                    results.add(CommandResult.error(NO_HANDLER_ERROR_PREFIX + command.getCommandType()));
                     continue;
                 }
                 
@@ -41,11 +45,11 @@ public class CommandExecutor {
                 results.add(result);
                 
             } catch (InvalidCommandException e) {
-                LOGGER.log(Level.WARNING, "Invalid command: " + commandLine, e);
-                results.add(CommandResult.error("Invalid command: " + e.getMessage()));
+                LOGGER.log(Level.WARNING, INVALID_COMMAND_ERROR_PREFIX + commandLine, e);
+                results.add(CommandResult.error(INVALID_COMMAND_ERROR_PREFIX + e.getMessage()));
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error executing command: " + commandLine, e);
-                results.add(CommandResult.error("Error executing command: " + e.getMessage()));
+                LOGGER.log(Level.SEVERE, EXECUTION_ERROR_PREFIX + commandLine, e);
+                results.add(CommandResult.error(EXECUTION_ERROR_PREFIX + e.getMessage()));
             }
         }
         

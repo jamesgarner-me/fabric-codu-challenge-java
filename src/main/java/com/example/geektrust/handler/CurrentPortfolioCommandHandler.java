@@ -1,6 +1,7 @@
 package com.example.geektrust.handler;
 
 import com.example.geektrust.command.ParsedCommand;
+import com.example.geektrust.constants.ErrorMessages;
 import com.example.geektrust.domain.Fund;
 import com.example.geektrust.domain.Portfolio;
 import com.example.geektrust.repository.FundRepository;
@@ -21,17 +22,15 @@ public class CurrentPortfolioCommandHandler implements CommandHandler {
     @Override
     public CommandResult handle(ParsedCommand command) {
         List<String> fundNames = command.getArguments();
-        List<Fund> funds = new ArrayList<>();
 
         for (String fundName : fundNames) {
             Optional<Fund> fund = fundRepository.getFundByName(fundName);
             if (!fund.isPresent()) {
-                return CommandResult.error("FUND_NOT_FOUND");
+                return CommandResult.error(ErrorMessages.FUND_NOT_FOUND);
             }
-            funds.add(fund.get());
         }
 
-        portfolio.setCurrentFunds(funds);
+        portfolio.setCurrentFundNames(fundNames);
         return CommandResult.success();
     }
 }

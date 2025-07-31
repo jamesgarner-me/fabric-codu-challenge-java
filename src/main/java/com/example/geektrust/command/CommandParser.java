@@ -11,6 +11,8 @@ public class CommandParser {
     private static final int CURRENT_PORTFOLIO_MIN_ARGS = 1;
     private static final int CALCULATE_OVERLAP_MIN_ARGS = 1;
     private static final int ADD_STOCK_MIN_ARGS = 2;
+    private static final String WHITESPACE_REGEX = "\\s+";
+    private static final int COMMAND_AND_ARGS_LIMIT = 2;
     
     public ParsedCommand parse(String commandLine) throws InvalidCommandException {
         if (commandLine == null || commandLine.trim().isEmpty()) {
@@ -18,7 +20,7 @@ public class CommandParser {
         }
         
         String trimmedLine = commandLine.trim();
-        String[] parts = trimmedLine.split("\\s+", 2);
+        String[] parts = trimmedLine.split(WHITESPACE_REGEX, COMMAND_AND_ARGS_LIMIT);
         
         if (parts.length == 0) {
             throw new InvalidCommandException("Invalid command format");
@@ -56,7 +58,7 @@ public class CommandParser {
         switch (commandType) {
             case CURRENT_PORTFOLIO:
                 // Multiple fund names separated by spaces
-                arguments.addAll(Arrays.asList(trimmedArgs.split("\\s+")));
+                arguments.addAll(Arrays.asList(trimmedArgs.split(WHITESPACE_REGEX)));
                 break;
                 
             case CALCULATE_OVERLAP:
@@ -66,13 +68,8 @@ public class CommandParser {
                 
             case ADD_STOCK:
                 // Fund name followed by stock name (which can contain spaces)
-                String[] addStockParts = trimmedArgs.split("\\s+", 2);
-                if (addStockParts.length >= 1) {
-                    arguments.add(addStockParts[0]); // Fund name
-                }
-                if (addStockParts.length >= 2) {
-                    arguments.add(addStockParts[1]); // Stock name (can contain spaces)
-                }
+                String[] addStockParts = trimmedArgs.split(WHITESPACE_REGEX, COMMAND_AND_ARGS_LIMIT);
+                arguments.addAll(Arrays.asList(addStockParts));
                 break;
                 
             default:

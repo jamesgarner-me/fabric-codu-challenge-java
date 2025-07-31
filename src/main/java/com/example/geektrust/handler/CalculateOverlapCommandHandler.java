@@ -1,6 +1,7 @@
 package com.example.geektrust.handler;
 
 import com.example.geektrust.command.ParsedCommand;
+import com.example.geektrust.constants.ErrorMessages;
 import com.example.geektrust.domain.Fund;
 import com.example.geektrust.domain.Portfolio;
 import com.example.geektrust.repository.FundRepository;
@@ -27,20 +28,23 @@ public class CalculateOverlapCommandHandler implements CommandHandler {
         Optional<Fund> targetFund = fundRepository.getFundByName(fundName);
         
         if (!targetFund.isPresent()) {
-            return CommandResult.error("FUND_NOT_FOUND");
+            return CommandResult.error(ErrorMessages.FUND_NOT_FOUND);
         }
 
-        List<Fund> currentFunds = portfolio.getCurrentFunds();
-        if (currentFunds.isEmpty()) {
+        List<String> currentFundNames = portfolio.getCurrentFundNames();
+        if (currentFundNames.isEmpty()) {
             return CommandResult.success();
         }
 
         List<String> outputs = new ArrayList<>();
-        for (Fund portfolioFund : currentFunds) {
-            double overlap = overlapCalculator.calculateOverlapPercentage(targetFund.get(), portfolioFund);
-            if (overlap > 0) {
-                String output = String.format("%s %s %.2f%%", fundName, portfolioFund.getName(), overlap);
-                outputs.add(output);
+        for (String portfolioFundName : currentFundNames) {
+            Optional<Fund> portfolioFund = fundRepository.getFundByName(portfolioFundName);
+            if (portfolioFund.isPresent()) {
+                double overlap = overlapCalculator.calculateOverlapPercentage(targetFund.get(), portfolioFund.get());
+                if (overlap > 0) {
+                    String output = String.format("%s %s %.2f%%", fundName, portfolioFundName, overlap);
+                    outputs.add(output);
+                }
             }
         }
 

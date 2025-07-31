@@ -35,13 +35,28 @@ public class Application {
         List<CommandResult> results = commandExecutor.executeCommands(commandLines);
         
         for (CommandResult result : results) {
-            if (!result.isSuccess() && result.getErrorMessage() != null) {
-                System.out.println(result.getErrorMessage());
-            } else if (result.hasOutput()) {
-                for (String output : result.getOutputs()) {
-                    System.out.println(output);
-                }
-            }
+            printResult(result);
+        }
+    }
+    
+    private void printResult(CommandResult result) {
+        if (shouldPrintError(result)) {
+            System.out.println(result.getErrorMessage());
+            return;
+        }
+        
+        if (result.hasOutput()) {
+            printOutputs(result.getOutputs());
+        }
+    }
+    
+    private boolean shouldPrintError(CommandResult result) {
+        return !result.isSuccess() && result.getErrorMessage() != null;
+    }
+    
+    private void printOutputs(List<String> outputs) {
+        for (String output : outputs) {
+            System.out.println(output);
         }
     }
 

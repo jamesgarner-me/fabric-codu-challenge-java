@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,17 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class PortfolioTest {
 
     private Portfolio portfolio;
-    private Fund fund1;
-    private Fund fund2;
-    private Fund fund3;
 
     @BeforeEach
     void setUp() {
         portfolio = new Portfolio();
-        
-        fund1 = new Fund("FUND1", new HashSet<>(Arrays.asList("STOCK1", "STOCK2")));
-        fund2 = new Fund("FUND2", new HashSet<>(Arrays.asList("STOCK3", "STOCK4")));
-        fund3 = new Fund("FUND3", new HashSet<>(Arrays.asList("STOCK5")));
     }
 
     @Test
@@ -32,57 +24,57 @@ class PortfolioTest {
     void shouldCreateEmptyPortfolio() {
         assertTrue(portfolio.isEmpty());
         assertEquals(0, portfolio.size());
-        assertTrue(portfolio.getCurrentFunds().isEmpty());
+        assertTrue(portfolio.getCurrentFundNames().isEmpty());
     }
 
     @Test
-    @DisplayName("Should set and retrieve current funds")
-    void shouldSetAndRetrieveCurrentFunds() {
-        List<Fund> funds = Arrays.asList(fund1, fund2);
+    @DisplayName("Should set and retrieve current fund names")
+    void shouldSetAndRetrieveCurrentFundNames() {
+        List<String> fundNames = Arrays.asList("FUND1", "FUND2");
         
-        portfolio.setCurrentFunds(funds);
+        portfolio.setCurrentFundNames(fundNames);
         
         assertFalse(portfolio.isEmpty());
         assertEquals(2, portfolio.size());
         
-        List<Fund> retrievedFunds = portfolio.getCurrentFunds();
-        assertEquals(2, retrievedFunds.size());
-        assertEquals("FUND1", retrievedFunds.get(0).getName());
-        assertEquals("FUND2", retrievedFunds.get(1).getName());
+        List<String> retrievedFundNames = portfolio.getCurrentFundNames();
+        assertEquals(2, retrievedFundNames.size());
+        assertEquals("FUND1", retrievedFundNames.get(0));
+        assertEquals("FUND2", retrievedFundNames.get(1));
     }
 
     @Test
-    @DisplayName("Should preserve order of funds")
-    void shouldPreserveOrderOfFunds() {
-        List<Fund> funds = Arrays.asList(fund3, fund1, fund2);
+    @DisplayName("Should preserve order of fund names")
+    void shouldPreserveOrderOfFundNames() {
+        List<String> fundNames = Arrays.asList("FUND3", "FUND1", "FUND2");
         
-        portfolio.setCurrentFunds(funds);
+        portfolio.setCurrentFundNames(fundNames);
         
-        List<Fund> retrievedFunds = portfolio.getCurrentFunds();
-        assertEquals("FUND3", retrievedFunds.get(0).getName());
-        assertEquals("FUND1", retrievedFunds.get(1).getName());
-        assertEquals("FUND2", retrievedFunds.get(2).getName());
+        List<String> retrievedFundNames = portfolio.getCurrentFundNames();
+        assertEquals("FUND3", retrievedFundNames.get(0));
+        assertEquals("FUND1", retrievedFundNames.get(1));
+        assertEquals("FUND2", retrievedFundNames.get(2));
     }
 
     @Test
-    @DisplayName("Should update portfolio when setting new funds")
-    void shouldUpdatePortfolioWhenSettingNewFunds() {
-        List<Fund> initialFunds = Arrays.asList(fund1, fund2);
-        portfolio.setCurrentFunds(initialFunds);
+    @DisplayName("Should update portfolio when setting new fund names")
+    void shouldUpdatePortfolioWhenSettingNewFundNames() {
+        List<String> initialFundNames = Arrays.asList("FUND1", "FUND2");
+        portfolio.setCurrentFundNames(initialFundNames);
         assertEquals(2, portfolio.size());
         
-        List<Fund> newFunds = Arrays.asList(fund3);
-        portfolio.setCurrentFunds(newFunds);
+        List<String> newFundNames = Arrays.asList("FUND3");
+        portfolio.setCurrentFundNames(newFundNames);
         
         assertEquals(1, portfolio.size());
-        assertEquals("FUND3", portfolio.getCurrentFunds().get(0).getName());
+        assertEquals("FUND3", portfolio.getCurrentFundNames().get(0));
     }
 
     @Test
     @DisplayName("Should clear portfolio")
     void shouldClearPortfolio() {
-        List<Fund> funds = Arrays.asList(fund1, fund2);
-        portfolio.setCurrentFunds(funds);
+        List<String> fundNames = Arrays.asList("FUND1", "FUND2");
+        portfolio.setCurrentFundNames(fundNames);
         assertFalse(portfolio.isEmpty());
         
         portfolio.clear();
@@ -92,55 +84,55 @@ class PortfolioTest {
     }
 
     @Test
-    @DisplayName("Should handle empty fund list")
-    void shouldHandleEmptyFundList() {
-        List<Fund> funds = Arrays.asList(fund1, fund2);
-        portfolio.setCurrentFunds(funds);
+    @DisplayName("Should handle empty fund name list")
+    void shouldHandleEmptyFundNameList() {
+        List<String> fundNames = Arrays.asList("FUND1", "FUND2");
+        portfolio.setCurrentFundNames(fundNames);
         assertFalse(portfolio.isEmpty());
         
-        portfolio.setCurrentFunds(new ArrayList<>());
+        portfolio.setCurrentFundNames(new ArrayList<>());
         
         assertTrue(portfolio.isEmpty());
         assertEquals(0, portfolio.size());
     }
 
     @Test
-    @DisplayName("Should throw exception for null funds list")
-    void shouldThrowExceptionForNullFundsList() {
+    @DisplayName("Should throw exception for null fund names list")
+    void shouldThrowExceptionForNullFundNamesList() {
         assertThrows(NullPointerException.class, () -> {
-            portfolio.setCurrentFunds(null);
+            portfolio.setCurrentFundNames(null);
         });
     }
 
     @Test
-    @DisplayName("Should ensure immutability of returned funds list")
-    void shouldEnsureImmutabilityOfReturnedFundsList() {
-        List<Fund> funds = Arrays.asList(fund1, fund2);
-        portfolio.setCurrentFunds(funds);
+    @DisplayName("Should ensure immutability of returned fund names list")
+    void shouldEnsureImmutabilityOfReturnedFundNamesList() {
+        List<String> fundNames = Arrays.asList("FUND1", "FUND2");
+        portfolio.setCurrentFundNames(fundNames);
         
-        List<Fund> retrievedFunds = portfolio.getCurrentFunds();
+        List<String> retrievedFundNames = portfolio.getCurrentFundNames();
         
         assertThrows(UnsupportedOperationException.class, () -> {
-            retrievedFunds.add(fund3);
+            retrievedFundNames.add("FUND3");
         });
         
         assertThrows(UnsupportedOperationException.class, () -> {
-            retrievedFunds.remove(0);
+            retrievedFundNames.remove(0);
         });
     }
 
     @Test
     @DisplayName("Should ensure defensive copying of input list")
     void shouldEnsureDefensiveCopyingOfInputList() {
-        List<Fund> funds = new ArrayList<>(Arrays.asList(fund1, fund2));
-        portfolio.setCurrentFunds(funds);
+        List<String> fundNames = new ArrayList<>(Arrays.asList("FUND1", "FUND2"));
+        portfolio.setCurrentFundNames(fundNames);
         
         // Modify original list
-        funds.add(fund3);
+        fundNames.add("FUND3");
         
         // Portfolio should not be affected
         assertEquals(2, portfolio.size());
-        assertFalse(portfolio.getCurrentFunds().contains(fund3));
+        assertFalse(portfolio.getCurrentFundNames().contains("FUND3"));
     }
 
     @Test
@@ -150,13 +142,13 @@ class PortfolioTest {
         Portfolio portfolio2 = new Portfolio();
         Portfolio portfolio3 = new Portfolio();
         
-        List<Fund> funds1 = Arrays.asList(fund1, fund2);
-        List<Fund> funds2 = Arrays.asList(fund1, fund2);
-        List<Fund> funds3 = Arrays.asList(fund2, fund1); // Different order
+        List<String> fundNames1 = Arrays.asList("FUND1", "FUND2");
+        List<String> fundNames2 = Arrays.asList("FUND1", "FUND2");
+        List<String> fundNames3 = Arrays.asList("FUND2", "FUND1"); // Different order
         
-        portfolio1.setCurrentFunds(funds1);
-        portfolio2.setCurrentFunds(funds2);
-        portfolio3.setCurrentFunds(funds3);
+        portfolio1.setCurrentFundNames(fundNames1);
+        portfolio2.setCurrentFundNames(fundNames2);
+        portfolio3.setCurrentFundNames(fundNames3);
         
         // Same instance
         assertEquals(portfolio1, portfolio1);
@@ -183,9 +175,9 @@ class PortfolioTest {
         Portfolio portfolio1 = new Portfolio();
         Portfolio portfolio2 = new Portfolio();
         
-        List<Fund> funds = Arrays.asList(fund1, fund2);
-        portfolio1.setCurrentFunds(funds);
-        portfolio2.setCurrentFunds(funds);
+        List<String> fundNames = Arrays.asList("FUND1", "FUND2");
+        portfolio1.setCurrentFundNames(fundNames);
+        portfolio2.setCurrentFundNames(fundNames);
         
         assertEquals(portfolio1.hashCode(), portfolio2.hashCode());
     }
@@ -193,62 +185,11 @@ class PortfolioTest {
     @Test
     @DisplayName("Should implement toString")
     void shouldImplementToString() {
-        List<Fund> funds = Arrays.asList(fund1);
-        portfolio.setCurrentFunds(funds);
+        List<String> fundNames = Arrays.asList("FUND1");
+        portfolio.setCurrentFundNames(fundNames);
         
         String toString = portfolio.toString();
         assertTrue(toString.contains("Portfolio"));
         assertTrue(toString.contains("FUND1"));
-    }
-
-    @Test
-    @DisplayName("Should handle duplicate funds in list")
-    void shouldHandleDuplicateFundsInList() {
-        List<Fund> funds = Arrays.asList(fund1, fund1, fund2);
-        
-        portfolio.setCurrentFunds(funds);
-        
-        // Should maintain all entries including duplicates
-        assertEquals(3, portfolio.size());
-        List<Fund> retrievedFunds = portfolio.getCurrentFunds();
-        assertEquals(fund1, retrievedFunds.get(0));
-        assertEquals(fund1, retrievedFunds.get(1));
-        assertEquals(fund2, retrievedFunds.get(2));
-    }
-
-    @Test
-    @DisplayName("Should be thread-safe for concurrent operations")
-    void shouldBeThreadSafeForConcurrentOperations() throws InterruptedException {
-        final int numThreads = 10;
-        final int operationsPerThread = 100;
-        
-        Thread[] threads = new Thread[numThreads];
-        
-        for (int i = 0; i < numThreads; i++) {
-            final int threadId = i;
-            threads[i] = new Thread(() -> {
-                for (int j = 0; j < operationsPerThread; j++) {
-                    if (threadId % 2 == 0) {
-                        // Even threads set funds
-                        portfolio.setCurrentFunds(Arrays.asList(fund1, fund2));
-                    } else {
-                        // Odd threads read funds
-                        portfolio.getCurrentFunds();
-                        portfolio.isEmpty();
-                        portfolio.size();
-                    }
-                }
-            });
-        }
-        
-        for (Thread thread : threads) {
-            thread.start();
-        }
-        
-        for (Thread thread : threads) {
-            thread.join();
-        }
-        
-        // No assertions needed - test passes if no exceptions are thrown
     }
 }

@@ -6,33 +6,33 @@ import java.util.List;
 import java.util.Objects;
 
 public class Portfolio {
-    private final List<Fund> currentFunds;
+    private final List<String> currentFundNames;
 
     public Portfolio() {
-        this.currentFunds = new ArrayList<>();
+        this.currentFundNames = new ArrayList<>();
     }
 
-    public synchronized void setCurrentFunds(List<Fund> funds) {
-        Objects.requireNonNull(funds, "Funds list cannot be null");
+    public synchronized void setCurrentFundNames(List<String> fundNames) {
+        Objects.requireNonNull(fundNames, "Fund names list cannot be null");
         
-        this.currentFunds.clear();
-        this.currentFunds.addAll(funds);
+        this.currentFundNames.clear();
+        this.currentFundNames.addAll(fundNames);
     }
 
-    public synchronized List<Fund> getCurrentFunds() {
-        return Collections.unmodifiableList(new ArrayList<>(currentFunds));
+    public synchronized List<String> getCurrentFundNames() {
+        return Collections.unmodifiableList(new ArrayList<>(currentFundNames));
     }
 
     public synchronized boolean isEmpty() {
-        return currentFunds.isEmpty();
+        return currentFundNames.isEmpty();
     }
 
     public synchronized int size() {
-        return currentFunds.size();
+        return currentFundNames.size();
     }
 
     public synchronized void clear() {
-        currentFunds.clear();
+        currentFundNames.clear();
     }
 
     @Override
@@ -40,18 +40,18 @@ public class Portfolio {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Portfolio portfolio = (Portfolio) o;
-        return Objects.equals(currentFunds, portfolio.currentFunds);
+        return Objects.equals(currentFundNames, portfolio.currentFundNames);
     }
 
     @Override
     public synchronized int hashCode() {
-        return Objects.hash(currentFunds);
+        return Objects.hash(currentFundNames);
     }
 
     @Override
     public synchronized String toString() {
         return "Portfolio{" +
-                "currentFunds=" + currentFunds +
+                "currentFundNames=" + currentFundNames +
                 '}';
     }
 }

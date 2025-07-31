@@ -14,6 +14,10 @@ import java.util.logging.Level;
 
 public class JsonFundRepository implements FundRepository {
     private static final Logger LOGGER = Logger.getLogger(JsonFundRepository.class.getName());
+    private static final String FUNDS_ARRAY_KEY = "funds";
+    private static final String FUND_NAME_KEY = "name";
+    private static final String FUND_STOCKS_KEY = "stocks";
+    
     private final Map<String, Fund> fundCache = new ConcurrentHashMap<>();
     private final List<Fund> allFunds = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -38,17 +42,10 @@ public class JsonFundRepository implements FundRepository {
         InputStream inputStream = null;
         
         try {
-            // Strategy 1: Try as file in current directory
+            // Strategy 1: Try as file (handles both relative and absolute paths)
             File jsonFile = new File(jsonFilePath);
             if (jsonFile.exists()) {
-                LOGGER.log(Level.INFO, "Loading funds from file: " + jsonFile.getAbsolutePath());
-                processJson(objectMapper.readTree(jsonFile));
-                return;
-            }
-            
-            // Strategy 2: Try as absolute path (if it's absolute and exists)
-            if (jsonFile.isAbsolute() && jsonFile.exists()) {
-                LOGGER.log(Level.INFO, "Loading funds from absolute path: " + jsonFile.getAbsolutePath());
+                // LOGGER.log(Level.INFO, "Loading funds from file: " + jsonFile.getAbsolutePath());
                 processJson(objectMapper.readTree(jsonFile));
                 return;
             }
@@ -56,7 +53,7 @@ public class JsonFundRepository implements FundRepository {
             // Strategy 3: Try as classpath resource (fallback for packaged JAR)
             inputStream = getClass().getClassLoader().getResourceAsStream(jsonFilePath);
             if (inputStream != null) {
-                LOGGER.log(Level.INFO, "Loading funds from classpath resource: " + jsonFilePath);
+                // LOGGER.log(Level.INFO, "Loading funds from classpath resource: " + jsonFilePath);
                 processJson(objectMapper.readTree(inputStream));
                 return;
             }
@@ -85,23 +82,23 @@ public class JsonFundRepository implements FundRepository {
     }
 
     private void processJson(JsonNode rootNode) {
-        if (rootNode == null || !rootNode.has("funds")) {
-            LOGGER.log(Level.WARNING, "Invalid JSON structure: missing 'funds' array");
+        if (rootNode == null || !rootNode.has(FUNDS_ARRAY_KEY)) {
+            LOGGER.log(Level.WARNING, "Invalid JSON structure: missing '" + FUNDS_ARRAY_KEY + "' array");
             return;
         }
 
-        JsonNode fundsArray = rootNode.get("funds");
+        JsonNode fundsArray = rootNode.get(FUNDS_ARRAY_KEY);
         if (!fundsArray.isArray()) {
-            LOGGER.log(Level.WARNING, "Invalid JSON structure: 'funds' is not an array");
+            LOGGER.log(Level.WARNING, "Invalid JSON structure: '" + FUNDS_ARRAY_KEY + "' is not an array");
             return;
         }
 
         for (JsonNode fundNode : fundsArray) {
             try {
-                String fundName = fundNode.get("name").asText();
+                String fundName = fundNode.get(FUND_NAME_KEY).asText();
                 Set<String> stocks = new HashSet<>();
                 
-                JsonNode stocksArray = fundNode.get("stocks");
+                JsonNode stocksArray = fundNode.get(FUND_STOCKS_KEY);
                 if (stocksArray != null && stocksArray.isArray()) {
                     for (JsonNode stockNode : stocksArray) {
                         stocks.add(stockNode.asText());
